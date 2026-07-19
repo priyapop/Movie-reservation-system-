@@ -37,7 +37,7 @@ export const register = async (req, res) => {
     const user = await authService.registerUser(
       username.trim(),
       password,
-      email.trim().toLowerCase()
+      email.trim().toLowerCase(),
     );
 
     return res.status(201).json({
@@ -48,6 +48,36 @@ export const register = async (req, res) => {
     if (error.message === "USER_ALREADY_EXISTS") {
       return res.status(409).json({
         message: "Username or email already exists.",
+      });
+    }
+
+    console.error(error);
+
+    return res.status(500).json({
+      message: "Internal server error.",
+    });
+  }
+};
+
+export const login = async (req, res) => {
+  const { username, password } = req.body;
+
+  if (!username || !password) {
+    return res.status(400).json({
+      message: "Username and password are required.",
+    });
+  }
+
+  try {
+    const result = await authService.loginUser(username.trim(), password);
+    return res.status(200).json({
+      message: "Login successful.",
+      ...result,
+    });
+  } catch (error) {
+    if (error.message === "INVALID_CREDENTIALS") {
+      return res.status(401).json({
+        message: "Invalid username or password.",
       });
     }
 
