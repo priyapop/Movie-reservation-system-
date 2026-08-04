@@ -28,3 +28,22 @@ export const getShowtimesByMovie = async (movieId) => {
     throw error;
   }
 };
+
+export const getSeatsForShowtime = async (showtimeId) => {
+  const result = await pool.query(
+    `SELECT 
+       seat.id AS seat_id,
+       seat.seat_no,
+       seat.hall_id,
+       ticket.id IS NOT NULL AS is_booked
+     FROM seat
+     JOIN showtime ON showtime.hall_id = seat.hall_id
+     LEFT JOIN ticket 
+       ON ticket.seat_id = seat.id 
+       AND ticket.showtime_id = showtime.id
+     WHERE showtime.id = $1
+     ORDER BY seat.seat_no`,
+    [showtimeId]
+  );
+  return result.rows;
+};
