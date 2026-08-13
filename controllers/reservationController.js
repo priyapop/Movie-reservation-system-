@@ -96,3 +96,29 @@ export const confirmSeats = async (req, res) => {
     res.status(500).json({ message: "Failed to confirm reservation" });
   }
 };
+
+export const cancelSeats = async (req, res) => {
+  const { seatIds } = req.body;
+  const showtimeId = req.params.id;
+  const userId = req.user.user_id;
+
+  if (!Array.isArray(seatIds) || seatIds.length === 0) {
+    return res.status(400).json({ message: 'seatIds must be a non-empty array' });
+  }
+
+  try {
+    const holdKeys = seatIds.map(seatId => `hold:${showtimeId}:${seatId}`);
+    const holders = await redis.mget(...holdKeys);
+
+    const ownedKeys = holdKeys.filter((key, i) => holders[i] === userId);
+
+    if (ownedKeys.length > 0) {
+      await redis.del(...ownedKeys);
+    }
+
+    res.status(200).json({ success: true, released: ownedKeys.length });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Failed to cancel hold' });
+  }
+};

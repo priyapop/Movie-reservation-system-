@@ -6,5 +6,6 @@ const router = express.Router();
 
 router.post("/showtimes/:id/hold", authenticate, reservationController.holdSeats);
 router.post("/showtimes/:id/confirm", authenticate, reservationController.confirmSeats);
+router.post("/showtimes/:id/cancel", authenticate, reservationController.cancelSeats);
 
 export default router;
