@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import movieRoutes from "./routes/movieRoutes.js";
 import authRoutes from "./routes/authRoutes.js"
 import showtimeRoutes from "./routes/showtimeRoutes.js"
+import reservationRoutes from './routes/reservationRoutes.js';
 
 dotenv.config();
 
@@ -23,6 +24,7 @@ app.get("/health", async (req, res) => {
 app.use("/api/movies", movieRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/showtimes",showtimeRoutes)
+app.use('/api', reservationRoutes);
 const port = process.env.PORT || 5000;
 
 app.listen(port, () => {
